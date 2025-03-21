@@ -11,7 +11,7 @@ let startTime;
 let timerInterval;
 
 // Selecting elements
-const textToType = document.getElementById("text-to-type");
+const textToType = document.getElementById("text-container");
 const inputBox = document.getElementById("input-box");
 const timerDisplay = document.getElementById("timer");
 const wpmDisplay = document.getElementById("wpm");
@@ -21,14 +21,20 @@ const resetBtn = document.getElementById("reset-btn");
 // Start Test
 startBtn.addEventListener("click", () => {
     selectedText = textArray[Math.floor(Math.random() * textArray.length)];
-    textToType.textContent = selectedText;
-    inputBox.value = "";
-    inputBox.disabled = false;
-    inputBox.focus();
-    
-    startTime = new Date().getTime();
-    timerDisplay.textContent = "0";
-    wpmDisplay.textContent = "0";
+
+    // Wrap each character in a span
+    textContainer.innerHTML = selectedText
+        .split("")
+        .map(char => `<span>${char}</span>`)
+        .join("");
+
+        inputBox.value = "";
+        inputBox.disabled = false;
+        inputBox.focus();
+                    
+        startTime = new Date().getTime();
+        timerDisplay.textContent = "0";
+        wpmDisplay.textContent = "0";
 
     // Start Timer
     clearInterval(timerInterval);
@@ -41,6 +47,22 @@ startBtn.addEventListener("click", () => {
 // Typing Event
 inputBox.addEventListener("input", () => {
     const typedText = inputBox.value;
+    const textSpans = textContainer.querySelectorAll("span");
+
+    let correctCount = 0;
+
+    textSpans.forEach((span, index) => {
+        if (typedText[index] === undefined) {
+            span.classList.remove("correct", "incorrect");
+        } else if (typedText[index] === selectedText[index]) {
+            span.classList.add("correct");
+            span.classList.remove("incorrect");
+            correctCount++;
+        } else {
+            span.classList.add("incorrect");
+            span.classList.remove("correct");
+        }
+    });
 
     // Check if completed
     if (typedText === selectedText) {
