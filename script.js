@@ -44,7 +44,7 @@ startBtn.addEventListener("click", () => {
     }, 1000);
 });
 
-// Typing Event
+// Typing Event - Highlight Mistakes
 inputBox.addEventListener("input", () => {
     const typedText = inputBox.value;
     const textSpans = textContainer.querySelectorAll("span");
@@ -64,15 +64,17 @@ inputBox.addEventListener("input", () => {
         }
     });
 
-    // Check if completed
-    if (typedText === selectedText) {
-        clearInterval(timerInterval);
-        let elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
-        let wordsTyped = selectedText.split(" ").length;
-        let wpm = Math.round((wordsTyped / elapsedTime) * 60);
-        wpmDisplay.textContent = wpm;
-    }
-});
+    // If typing is completed, calculate WPM
+        if (typedText === selectedText) {
+            clearInterval(timerInterval);
+            let elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
+            let wordsTyped = selectedText.split(" ").length;
+            let wpm = Math.round((wordsTyped / elapsedTime) * 60);
+            wpmDisplay.textContent = wpm;
+        }
+    });
+
+
 
 // Reset Test
 resetBtn.addEventListener("click", () => {
@@ -83,3 +85,65 @@ resetBtn.addEventListener("click", () => {
     timerDisplay.textContent = "0";
     wpmDisplay.textContent = "0";
 });
+
+
+
+// Load leaderboard from LocalStorage
+function loadLeaderboard() {
+    let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    const leaderboardElement = document.getElementById("leaderboard");
+            
+    leaderboardElement.innerHTML = scores
+        .map((score, index) => `<li>${index + 1}. ${score} WPM</li>`)
+        .join("");
+}
+
+
+// Save new score
+function saveScore(wpm) {
+    let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+        
+    scores.push(wpm);
+    scores.sort((a, b) => b - a); // Sort in descending order
+    scores = scores.slice(0, 5);  // Keep only top 5
+                        
+    localStorage.setItem("leaderboard", JSON.stringify(scores));
+    loadLeaderboard(); // Update leaderboard display
+}
+
+
+// Modify Typing Event to save WPM
+inputBox.addEventListener("input", () => {
+    const typedText = inputBox.value;
+    const textSpans = textContainer.querySelectorAll("span");
+
+    let correctCount = 0;
+
+    textSpans.forEach((span, index) => {
+        if (typedText[index] === undefined) {
+            span.classList.remove("correct", "incorrect");
+        } else if (typedText[index] === selectedText[index]) {
+            span.classList.add("correct");
+            span.classList.remove("incorrect");
+            correctCount++;
+        } else {
+            span.classList.add("incorrect");
+            span.classList.remove("correct");
+        }
+    });
+
+
+// If typing is completed, save WPM
+    if (typedText === selectedText) {
+        clearInterval(timerInterval);
+        let elapsedTime = Math.floor((new Date().getTime() - startTime) / 1000);
+        let wordsTyped = selectedText.split(" ").length;
+        let wpm = Math.round((wordsTyped / elapsedTime) * 60);
+        wpmDisplay.textContent = wpm;
+                                                    
+        saveScore(wpm); // Save to leaderboard
+    }
+});
+
+// Load leaderboard on page load 
+window.onload = loadLeaderboard;

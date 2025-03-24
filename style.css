@@ -33,3 +33,38 @@ button {
     font-size: 16px;
     cursor: pointer;
 }
+
+
+#text-container {
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+    text-decoration: underline;
+}
+
+/* leaderbord */
+
+h2{
+    margin-top: 20px;
+}
+
+#leaderboard {
+    life-style-top: none ;
+    padding: 0;
+}
+
+#leaderboard li {
+    font-size: 18px;
+    padding: 5px;
+    background: #ddd;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+          
